@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  ms-order-api:
+    image: ms-order-api:latest
+    container_name: ms-order-api
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

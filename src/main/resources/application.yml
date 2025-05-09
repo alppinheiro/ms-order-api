@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: ms-order-api
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
