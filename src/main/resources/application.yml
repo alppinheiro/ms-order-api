@@ -6,7 +6,19 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info
+        include: health, info, metrics, prometheus
   endpoint:
     health:
       show-details: always
+  metrics:
+    tags:
+      application: ms-order-api-observabilidade
+
+tracing:
+  sampling:
+    probability: 1.0  # 100% das requisições serão rastreadas
+
+otel:
+  exporter:
+    otlp:
+      endpoint: http://localhost:4317  # OpenTelemetry Collector, Jaeger, Tempo...
