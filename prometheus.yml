@@ -1,8 +1,24 @@
+#global:
+#  scrape_interval: 15s
+
+# docker
+#scrape_configs:
+#  - job_name: 'springboot'
+#    metrics_path: '/actuator/prometheus'
+#    static_configs:
+#      - targets: ['192.168.0.110:8080'] # use seu IP local se necessário
+
 global:
   scrape_interval: 15s
+  evaluation_interval: 15s
 
 scrape_configs:
   - job_name: 'springboot'
     metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['192.168.1.15:8080'] # use seu IP local se necessário
+    kubernetes_sd_configs:
+      - role: endpoints
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: ms-order;ms-order-api;http
+

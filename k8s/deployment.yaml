@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: ms-order-api
-          image: ms-order-api:0.0.1
+          image: ms-order-api:0.0.5
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

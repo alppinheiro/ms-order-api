@@ -15,7 +15,7 @@ class CriarPedidoService(
     override fun criar(pedido: Pedido): Pedido {
         logger.info { "Camada service: CriarPedidoUseCase" }
         return pedidoRepository.salvar(pedido).also {
-            metrics.registrarContador("pedidi.quantidade", mapOf(
+            metrics.registrarContador("pedido.quantidade", mapOf(
                 "idPedido" to it.id.toString(),
                 "status" to it.status.toString(),
                 "valorTotal" to it.valorTotal.toString()))
