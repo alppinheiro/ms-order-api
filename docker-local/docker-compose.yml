@@ -1,0 +1,94 @@
+#version: '3.8'
+
+services:
+#  ms-order-api:
+#    image: ms-order-api:latest
+#    container_name: ms-order-api
+#    ports:
+#      - "8080:8080"
+#    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    #network_mode: "host"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - network-docker
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - network-docker
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yml" ]
+    ports:
+      - "4317:4317" # OTLP gRPC
+      - "3200:3200" # Tempo HTTP
+    volumes:
+      - ./tempo.yml:/etc/tempo.yml
+
+  postgresql-master:
+    image: bitnami/postgresql
+    container_name: postgresql-master
+    ports: ['5432:5432']
+    volumes:
+      - postgresql_master_data:/bitnami/postgresql
+      - ./init-db-write/db.sql:/docker-entrypoint-initdb.d/db.sql
+    restart: always
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_user
+      - POSTGRESQL_USERNAME=user
+      - POSTGRESQL_PASSWORD=password
+      - POSTGRESQL_DATABASE=order_db
+    networks:
+      - network-docker
+  postgresql-slave:
+    image: bitnami/postgresql
+    container_name: postgresql-slave
+    restart: always
+    depends_on:
+      - postgresql-master
+    environment:
+      - POSTGRESQL_MASTER_HOST=postgresql-master
+      - POSTGRESQL_MASTER_PORT_NUMBER=5432
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_user
+      - POSTGRESQL_USERNAME=user
+      - POSTGRESQL_PASSWORD=password
+    ports: ['5433:5432']
+    volumes:
+      - postgresql_slave_data:/bitnami/postgresql
+    networks:
+      - network-docker
+
+volumes:
+  postgresql_master_data:
+    driver: local
+  postgresql_slave_data:
+    driver: local
+  grafana-storage:
+    driver: local
+
+networks:
+  network-docker:
+    driver: bridge
