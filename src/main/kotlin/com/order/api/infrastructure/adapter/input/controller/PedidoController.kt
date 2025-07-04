@@ -41,7 +41,7 @@ class PedidoController(
     @Counted(value = "api.pedido.controller.count", description = "Contador de chamadas ao endpoint consultar")
     @Timed(value = "api.pedido.controller.timer", description = "Tempo de resposta do endpoint consultar")
     @GetMapping("/{id}")
-    fun consultar(@PathVariable id: UUID): ResponseEntity<PedidoResponse> {
+    fun consultar(@PathVariable id: Long): ResponseEntity<PedidoResponse> {
         logger.info { "Chamando endpoint /consultar/${id}" }
         val pedido = consultarPedidoUseCase.consultar(id)
         return pedido?.let {

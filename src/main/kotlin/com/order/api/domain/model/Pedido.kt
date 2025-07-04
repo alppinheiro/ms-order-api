@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class Pedido(
-    val id: UUID = UUID.randomUUID(),
+    val id: Long = 0L,
     val dataCriacao: LocalDateTime = LocalDateTime.now(),
     val cliente: Cliente,
     val enderecoEntrega: Endereco,

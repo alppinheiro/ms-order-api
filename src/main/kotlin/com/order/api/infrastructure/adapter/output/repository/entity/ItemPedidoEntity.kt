@@ -22,5 +22,5 @@ data class ItemPedidoEntity(
     val precoUnitario: BigDecimal,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pedido_id")
-    val pedido: Pedido
+    val pedido: PedidoEntity
 )

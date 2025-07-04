@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap
 class PedidoRepositoryInMemory : PedidoRepository {
 
     private val logger = KotlinLogging.logger {}
-    private val pedidos = ConcurrentHashMap<UUID, Pedido>()
+    private val pedidos = ConcurrentHashMap<Long, Pedido>()
 
     override fun salvar(pedido: Pedido): Pedido {
         logger.info { "Camada repository: metodo salvar" }
@@ -18,7 +18,7 @@ class PedidoRepositoryInMemory : PedidoRepository {
         return pedido
     }
 
-    override fun buscarPorId(id: UUID): Pedido? {
+    override fun buscarPorId(id: Long): Pedido? {
         logger.info { "Camada repository: metodo buscarPorId. Pedido: ${pedidos[id]}" }
         return pedidos[id]
     }

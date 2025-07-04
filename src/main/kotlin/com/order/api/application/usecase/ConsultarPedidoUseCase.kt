@@ -4,5 +4,5 @@ import com.order.api.domain.model.Pedido
 import java.util.UUID
 
 interface ConsultarPedidoUseCase {
-    fun consultar(id: UUID): Pedido?
+    fun consultar(id: Long): Pedido?
 }

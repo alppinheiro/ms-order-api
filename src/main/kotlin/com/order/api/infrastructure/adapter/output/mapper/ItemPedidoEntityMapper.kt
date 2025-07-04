@@ -4,13 +4,15 @@ import com.order.api.domain.model.ItemPedido
 import com.order.api.domain.model.Pedido
 import com.order.api.infrastructure.adapter.output.repository.entity.ItemPedidoEntity
 
-class ItemPedidoEntityMapper {
+class ItemPedidoEntityMapper(
+    private val pedidoEntityMapper: PedidoEntityMapper
+) {
     fun toEntity(model: ItemPedido, pedido: Pedido) = ItemPedidoEntity(
         id = 0,
         produto = model.produto,
         quantidade = model.quantidade,
         precoUnitario = model.precoUnitario,
-        pedido = pedido
+        pedido = pedidoEntityMapper.toEntity(pedido)
     )
 
     fun toModel(entity: ItemPedidoEntity) = ItemPedido(

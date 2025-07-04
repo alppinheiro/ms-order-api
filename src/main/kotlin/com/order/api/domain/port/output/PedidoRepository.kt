@@ -5,5 +5,5 @@ import java.util.UUID
 
 interface PedidoRepository {
     fun salvar(pedido: Pedido): Pedido
-    fun buscarPorId(id: UUID): Pedido?
+    fun buscarPorId(id: Long): Pedido?
 }

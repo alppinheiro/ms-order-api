@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 data class PedidoResponse(
-    val id: UUID,
+    val id: Long,
     val dataCriacao: LocalDateTime,
     val cliente: ClienteResponse,
     val enderecoEntrega: EnderecoResponse,

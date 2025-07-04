@@ -6,9 +6,9 @@ import com.order.api.infrastructure.adapter.output.repository.entity.PedidoEntit
 import com.order.api.infrastructure.adapter.output.repository.entity.StatusPedidoEntity
 
 class PedidoEntityMapper(
-    private val clienteMapper: ClienteEntityMapper = ClienteEntityMapper(),
-    private val enderecoMapper: EnderecoEntityMapper = EnderecoEntityMapper(),
-    private val itemMapper: ItemPedidoEntityMapper = ItemPedidoEntityMapper()
+    private val clienteMapper: ClienteEntityMapper,
+    private val enderecoMapper: EnderecoEntityMapper,
+    private val itemMapper: ItemPedidoEntityMapper
 ) {
     fun toEntity(model: Pedido): PedidoEntity {
         val clienteEntity = clienteMapper.toEntity(model.cliente)
