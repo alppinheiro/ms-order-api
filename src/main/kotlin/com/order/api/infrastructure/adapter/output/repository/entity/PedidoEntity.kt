@@ -17,7 +17,7 @@ import java.util.*
 
 @Entity
 @Table(name = "pedidos")
-data class Pedido(
+data class PedidoEntity(
     @Id
     val id: UUID = UUID.randomUUID(),
 
