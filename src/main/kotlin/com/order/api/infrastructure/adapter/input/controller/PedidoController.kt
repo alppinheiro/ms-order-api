@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.Parameter
 
-@Tag(name = "Orders", description = "Operações relacionadas a pedidos")
+@Tag(name = "Pedidos", description = "Operações relacionadas a pedidos")
 @RestController
 @RequestMapping("/orders")
 class PedidoController(
