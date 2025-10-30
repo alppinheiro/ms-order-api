@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.Parameter
 
-@Tag(name = "Orders", description = "Operations related to orders")
+@Tag(name = "Orders", description = "Operações relacionadas a pedidos")
 @RestController
 @RequestMapping("/orders")
 class PedidoController(
@@ -36,38 +36,28 @@ class PedidoController(
 ) {
     private val logger = KotlinLogging.logger {}
 
-    private val requestExample = """
-    {
-      "cliente": { "nome": "João Silva", "email": "joao@example.com", "cpf": "123.456.789-00" },
-      "enderecoEntrega": { "rua": "Rua A", "numero": "100", "complemento": "Apto 10", "bairro": "Centro", "cidade": "São Paulo", "estado": "SP", "cep": "01000-000" },
-      "itens": [ { "produto": "Caneca", "quantidade": 2, "precoUnitario": 25.5 }, { "produto": "Camiseta", "quantidade": 1, "precoUnitario": 59.9 } ]
-    }
-    """.trimIndent()
-
-    private val responseExample = """
-    {
-      "id": 1,
-      "dataCriacao": "2025-10-29T12:00:00",
-      "cliente": { "nome": "João Silva", "email": "joao@example.com", "cpf": "123.456.789-00" },
-      "enderecoEntrega": { "rua": "Rua A", "numero": "100", "complemento": "Apto 10", "bairro": "Centro", "cidade": "São Paulo", "estado": "SP", "cep": "01000-000" },
-      "itens": [ { "produto": "Caneca", "quantidade": 2, "precoUnitario": 25.5 }, { "produto": "Camiseta", "quantidade": 1, "precoUnitario": 59.9 } ],
-      "valorTotal": 111.0,
-      "status": "CRIADO"
-    }
-    """.trimIndent()
-
-    @Counted(value = "api.pedido.controller.count", description = "Contador de chamadas ao endpoint hello")
+    @Counted(value = "api.pedido.controller.count", description = "Contador de chamadas ao endpoint criar")
     @Timed(value = "api.pedido.controller.timer", description = "Tempo de resposta do endpoint criar")
-    @Operation(summary = "Create order", description = "Creates a new order")
+    @Operation(summary = "Criar pedido", description = "Cria um novo pedido")
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Order created",
+                description = "Pedido criado",
                 content = [
                     Content(
                         schema = Schema(implementation = PedidoResponse::class),
-                        examples = [ExampleObject(value = """${'$'}requestExample""")]
+                        examples = [
+                            ExampleObject(value = """{
+  "id": 1,
+  "dataCriacao": "2025-10-29T12:00:00",
+  "cliente": { "nome": "João Silva", "email": "joao@example.com", "cpf": "123.456.789-00" },
+  "enderecoEntrega": { "rua": "Rua A", "numero": "100", "complemento": "Apto 10", "bairro": "Centro", "cidade": "São Paulo", "estado": "SP", "cep": "01000-000" },
+  "itens": [ { "produto": "Caneca", "quantidade": 2, "precoUnitario": 25.5 }, { "produto": "Camiseta", "quantidade": 1, "precoUnitario": 59.9 } ],
+  "valorTotal": 111.0,
+  "status": "CRIADO"
+}""")
+                        ]
                     )
                 ]
             )
@@ -81,7 +71,13 @@ class PedidoController(
             content = [
                 Content(
                     mediaType = "application/json",
-                    examples = [ExampleObject(value = """${'$'}requestExample""")]
+                    examples = [
+                        ExampleObject(value = """{
+  "cliente": { "nome": "João Silva", "email": "joao@example.com", "cpf": "123.456.789-00" },
+  "enderecoEntrega": { "rua": "Rua A", "numero": "100", "complemento": "Apto 10", "bairro": "Centro", "cidade": "São Paulo", "estado": "SP", "cep": "01000-000" },
+  "itens": [ { "produto": "Caneca", "quantidade": 2, "precoUnitario": 25.5 }, { "produto": "Camiseta", "quantidade": 1, "precoUnitario": 59.9 } ]
+}""")
+                    ]
                 )
             ]
         )
@@ -97,20 +93,41 @@ class PedidoController(
 
     @Counted(value = "api.pedido.controller.count", description = "Contador de chamadas ao endpoint consultar")
     @Timed(value = "api.pedido.controller.timer", description = "Tempo de resposta do endpoint consultar")
-    @Operation(summary = "Get order", description = "Retrieve an order by id")
+    @Operation(summary = "Consultar pedido", description = "Recupera um pedido por id")
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Order found",
+                description = "Pedido encontrado",
                 content = [
                     Content(
                         schema = Schema(implementation = PedidoResponse::class),
-                        examples = [ExampleObject(value = """${'$'}responseExample""")]
+                        examples = [
+                            ExampleObject(value = """{
+  "id": 1,
+  "dataCriacao": "2025-10-29T12:00:00",
+  "cliente": { "nome": "João Silva", "email": "joao@example.com", "cpf": "123.456.789-00" },
+  "enderecoEntrega": { "rua": "Rua A", "numero": "100", "complemento": "Apto 10", "bairro": "Centro", "cidade": "São Paulo", "estado": "SP", "cep": "01000-000" },
+  "itens": [ { "produto": "Caneca", "quantidade": 2, "precoUnitario": 25.5 }, { "produto": "Camiseta", "quantidade": 1, "precoUnitario": 59.9 } ],
+  "valorTotal": 111.0,
+  "status": "CRIADO"
+}""")
+                        ]
                     )
                 ]
             ),
-            ApiResponse(responseCode = "404", description = "Order not found")
+            ApiResponse(
+                responseCode = "404",
+                description = "Pedido não encontrado",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        examples = [
+                            ExampleObject(value = """{ "message": "Pedido não encontrado" }""")
+                        ]
+                    )
+                ]
+            )
         ]
     )
     @GetMapping("/{id}")
