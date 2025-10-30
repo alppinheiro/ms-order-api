@@ -196,11 +196,3 @@ Licença
 
 
 ---
-
-Se quiser, eu posso:
-
-- Gerar exemplos de testes de integração (SpringBootTest) que inicializam o contexto e testam os endpoints.
-- Alterar `BeansConfiguration` para trocar para implementação JPA por profile (`dev`/`prod`).
-- Adicionar um `docker-compose` menor só com Postgres + aplicação para facilitar desenvolvimento.
-
-Me diga qual desses próximos passos prefere que eu faça e eu implemento.
