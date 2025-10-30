@@ -24,6 +24,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.media.ExampleObject
+import io.swagger.v3.oas.annotations.Parameter
 
 @Tag(name = "Orders", description = "Operations related to orders")
 @RestController
@@ -34,6 +36,26 @@ class PedidoController(
 ) {
     private val logger = KotlinLogging.logger {}
 
+    private val requestExample = """
+    {
+      "cliente": { "nome": "João Silva", "email": "joao@example.com", "cpf": "123.456.789-00" },
+      "enderecoEntrega": { "rua": "Rua A", "numero": "100", "complemento": "Apto 10", "bairro": "Centro", "cidade": "São Paulo", "estado": "SP", "cep": "01000-000" },
+      "itens": [ { "produto": "Caneca", "quantidade": 2, "precoUnitario": 25.5 }, { "produto": "Camiseta", "quantidade": 1, "precoUnitario": 59.9 } ]
+    }
+    """.trimIndent()
+
+    private val responseExample = """
+    {
+      "id": 1,
+      "dataCriacao": "2025-10-29T12:00:00",
+      "cliente": { "nome": "João Silva", "email": "joao@example.com", "cpf": "123.456.789-00" },
+      "enderecoEntrega": { "rua": "Rua A", "numero": "100", "complemento": "Apto 10", "bairro": "Centro", "cidade": "São Paulo", "estado": "SP", "cep": "01000-000" },
+      "itens": [ { "produto": "Caneca", "quantidade": 2, "precoUnitario": 25.5 }, { "produto": "Camiseta", "quantidade": 1, "precoUnitario": 59.9 } ],
+      "valorTotal": 111.0,
+      "status": "CRIADO"
+    }
+    """.trimIndent()
+
     @Counted(value = "api.pedido.controller.count", description = "Contador de chamadas ao endpoint hello")
     @Timed(value = "api.pedido.controller.timer", description = "Tempo de resposta do endpoint criar")
     @Operation(summary = "Create order", description = "Creates a new order")
@@ -42,12 +64,29 @@ class PedidoController(
             ApiResponse(
                 responseCode = "200",
                 description = "Order created",
-                content = [Content(schema = Schema(implementation = PedidoResponse::class))]
+                content = [
+                    Content(
+                        schema = Schema(implementation = PedidoResponse::class),
+                        examples = [ExampleObject(value = """${'$'}requestExample""")]
+                    )
+                ]
             )
         ]
     )
     @PostMapping
-    fun criar(@RequestBody request: PedidoRequest): ResponseEntity<PedidoResponse> {
+    fun criar(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Payload para criação de pedido",
+            required = true,
+            content = [
+                Content(
+                    mediaType = "application/json",
+                    examples = [ExampleObject(value = """${'$'}requestExample""")]
+                )
+            ]
+        )
+        @RequestBody request: PedidoRequest
+    ): ResponseEntity<PedidoResponse> {
         logger.info { "Chamando endpoint /criar" }
         val pedidoCriado = criarPedidoUseCase.criar(PedidoRequestMapper.toDomain(request))
         val response = PedidoResponseMapper.fromDomain(pedidoCriado)
@@ -64,13 +103,21 @@ class PedidoController(
             ApiResponse(
                 responseCode = "200",
                 description = "Order found",
-                content = [Content(schema = Schema(implementation = PedidoResponse::class))]
+                content = [
+                    Content(
+                        schema = Schema(implementation = PedidoResponse::class),
+                        examples = [ExampleObject(value = """${'$'}responseExample""")]
+                    )
+                ]
             ),
             ApiResponse(responseCode = "404", description = "Order not found")
         ]
     )
     @GetMapping("/{id}")
-    fun consultar(@PathVariable id: Long): ResponseEntity<PedidoResponse> {
+    fun consultar(
+        @Parameter(description = "ID do pedido", example = "1")
+        @PathVariable id: Long
+    ): ResponseEntity<PedidoResponse> {
         logger.info { "Chamando endpoint /consultar/${id}" }
         val pedido = consultarPedidoUseCase.consultar(id)
         return pedido?.let {
