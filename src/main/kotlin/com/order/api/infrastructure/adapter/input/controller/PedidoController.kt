@@ -18,6 +18,15 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
+// Anotações OpenAPI
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Tag(name = "Orders", description = "Operations related to orders")
 @RestController
 @RequestMapping("/orders")
 class PedidoController(
@@ -28,6 +37,16 @@ class PedidoController(
 
     @Counted(value = "api.pedido.controller.count", description = "Contador de chamadas ao endpoint hello")
     @Timed(value = "api.pedido.controller.timer", description = "Tempo de resposta do endpoint criar")
+    @Operation(summary = "Create order", description = "Creates a new order")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Order created",
+                content = [Content(schema = Schema(implementation = PedidoResponse::class))]
+            )
+        ]
+    )
     @PostMapping
     fun criar(@RequestBody request: PedidoRequest): ResponseEntity<PedidoResponse> {
         logger.info { "Chamando endpoint /criar" }
@@ -40,6 +59,17 @@ class PedidoController(
 
     @Counted(value = "api.pedido.controller.count", description = "Contador de chamadas ao endpoint consultar")
     @Timed(value = "api.pedido.controller.timer", description = "Tempo de resposta do endpoint consultar")
+    @Operation(summary = "Get order", description = "Retrieve an order by id")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Order found",
+                content = [Content(schema = Schema(implementation = PedidoResponse::class))]
+            ),
+            ApiResponse(responseCode = "404", description = "Order not found")
+        ]
+    )
     @GetMapping("/{id}")
     fun consultar(@PathVariable id: Long): ResponseEntity<PedidoResponse> {
         logger.info { "Chamando endpoint /consultar/${id}" }
