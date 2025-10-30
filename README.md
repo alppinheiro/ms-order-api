@@ -161,6 +161,11 @@ Observabilidade
 - Spring Actuator expõe endpoints: /actuator/health, /actuator/info, /actuator/metrics e /actuator/prometheus conforme `application.yml`.
 - Micrometer + Prometheus: há dependência de `micrometer-registry-prometheus` e o `docker-local/docker-compose.yml` inclui um container Prometheus; as métricas do app são expostas em `/actuator/prometheus`.
 - OpenTelemetry: `otel.exporter.otlp.endpoint` aponta para `http://localhost:4317` (Tempo/OTLP) e sampling está 100% por padrão (via `tracing.sampling.probability: 1.0`).
+- OpenAPI / Swagger
+  - A documentação OpenAPI é gerada automaticamente pelo `springdoc` e ficará disponível quando a aplicação estiver rodando em:
+    - Swagger UI: `/swagger-ui.html` ou `/swagger-ui/index.html`
+    - Spec JSON: `/v3/api-docs`
+  - Esses endpoints usam as classes, controladores e DTOs para montar a especificação automaticamente.
 
 Métricas personalizadas
 
