@@ -3,7 +3,6 @@ package com.order.api.infrastructure.adapter.input.controller.response
 import com.order.api.domain.model.StatusPedido
 import java.math.BigDecimal
 import java.time.LocalDateTime
-import java.util.UUID
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "Representação de um pedido")
