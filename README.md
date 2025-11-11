@@ -2,14 +2,20 @@
 
 Resumo rápido
 
-Microserviço em Kotlin com Spring Boot para gerenciamento de pedidos (orders). Implementa endpoints REST para criação e consulta de pedidos, métricas com Micrometer/Prometheus e integração opcional com PostgreSQL via JPA/Flyway. O projeto segue um estilo Ports & Adapters (Hexagonal) claro: casos de uso na camada de aplicação, lógica de negócio no domínio e adaptadores para entrada (REST) e saída (repositórios, métricas).
+Microserviço em Kotlin com Spring Boot para gerenciamento de pedidos (orders). Implementa endpoints REST para criação e consulta de pedidos, métricas com Micrometer/Prometheus e integração opcional com PostgreSQL via JPA/Flyway. O projeto segue um estilo Ports & Adapters (Hexagonal): casos de uso na camada de aplicação, lógica de negócio no domínio e adaptadores para entrada (REST) e saída (repositórios, métricas).
+
+O README foi atualizado para refletir as mudanças recentes:
+- O endpoint POST /orders agora retorna HTTP 201 Created com header Location: /orders/{id}.
+- Validação de payloads via Jakarta Bean Validation (Hibernate Validator) está ativa; requisições inválidas retornam 400 com JSON estruturado (veja seção "Validação e erros").
+- Repositório in-memory (`PedidoRepositoryInMemory`) gera IDs sequenciais e está ativo por padrão como profile `default`/`inmemory`.
+- Para execuções locais de teste recomendamos desabilitar o restart automático do DevTools (variável de ambiente demonstrada abaixo).
 
 Checklist do que este README cobre
 
 - [x] O que o projeto faz
 - [x] Arquitetura e organização do código
 - [x] Tecnologias usadas
-- [x] Endpoints e exemplos de payload
+- [x] Endpoints e exemplos de payload (atualizados)
 - [x] Como rodar (modo rápido com repositório em memória / com PostgreSQL)
 - [x] Docker / docker-compose / Kubernetes (Makefile)
 - [x] Observabilidade (Actuator, Prometheus, OpenTelemetry)
@@ -23,7 +29,7 @@ O serviço expõe uma API REST com os principais recursos para gerenciar pedidos
 - Criar pedido: POST /orders
 - Consultar pedido: GET /orders/{id}
 
-Ao criar um pedido são calculados os totais a partir dos itens informados e o pedido é persistido (por padrão, há um repositório em memória ativo via `BeansConfiguration`). Há também implementações para persistência via JPA (entidades em `infrastructure/adapter/output/repository/entity`) e um `PedidoRepositoryImpl` que usa `PedidoJPARepository`.
+Ao criar um pedido são calculados os totais a partir dos itens informados e o pedido é persistido. Por padrão a aplicação usa um repositório em memória (`PedidoRepositoryInMemory`), mas há implementação JPA (Postgres) disponível e com Flyway para migrações.
 
 Arquitetura
 
@@ -52,9 +58,10 @@ Tecnologias
 - Flyway (migrations em `src/main/resources/db/migration`)
 - HikariCP
 - Micrometer + micrometer-registry-prometheus
-- OpenTelemetry (OTLP exporter) / Tempo (configurada nos exemplos)
+- OpenTelemetry (OTLP exporter)
 - Docker (Dockerfile) e Docker Compose (em `docker-local/`)
-- Kubernetes manifests em `k8s/` e Makefile para deploy local
+- Kubernetes manifests em `k8s/`
+- Jakarta Bean Validation (Hibernate Validator) — validação de payloads ativada
 
 Endpoints (Resumo)
 
@@ -89,12 +96,12 @@ Endpoints (Resumo)
 - Exemplo de curl (criar):
 
 ```bash
-curl -s -X POST http://localhost:8080/orders \
+curl -i -X POST http://localhost:8080/orders \
   -H 'Content-Type: application/json' \
   -d '{"cliente": {"nome":"João","email":"joao@example.com","cpf":"000"},"enderecoEntrega":{"rua":"Rua","numero":"1","complemento":null,"bairro":"B","cidade":"C","estado":"S","cep":"00000-000"},"itens":[{"produto":"X","quantidade":1,"precoUnitario":10.0}] }'
 ```
 
-- Resposta: HTTP 200 com payload do pedido criado (campos: id, dataCriacao, cliente, enderecoEntrega, itens, valorTotal, status).
+- Resposta: HTTP 201 Created com header `Location: /orders/{id}` e body JSON com o pedido criado (campos: id, dataCriacao, cliente, enderecoEntrega, itens, valorTotal, status).
 
 2) Consultar pedido
 
@@ -107,18 +114,38 @@ curl -s http://localhost:8080/orders/1
 
 - Resposta: HTTP 200 com o pedido ou 404 se não encontrado.
 
+Validação e erros
+
+- Payloads são validados automaticamente com Jakarta Bean Validation (@Valid / @NotBlank / @Email / @Positive / @NotEmpty).
+- Erros de validação retornam HTTP 400 com um JSON estruturado semelhante a:
+
+```json
+{
+  "timestamp": "2025-11-11T02:39:42.886Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Requisição inválida. Verifique os campos e tente novamente.",
+  "errors": [
+    { "field": "cliente.email", "message": "deve ser um endereço de e-mail bem formado" },
+    { "field": "enderecoEntrega.rua", "message": "não deve estar em branco" }
+  ]
+}
+```
+
+Observações:
+- As mensagens exatas podem vir do provider de validação; se preferir mensagens customizadas em PT-BR posso adicionar um arquivo `ValidationMessages_pt_BR.properties` e chaves de mensagem.
+
 Persistência e migrações
 
 - Há arquivos de migração SQL localizados em `src/main/resources/db/migration` (`V1__...` até `V5__...`).
-- `DataSourceConfig` define datasources `spring.datasource.write` (primary) e `spring.datasource.read` e cria um bean `Flyway` que usaria o datasource de escrita.
-- Atenção: no `application.yml` as propriedades do Flyway estão com `enabled: false` — ajuste se quiser ativar as migrações automaticamente.
-- Por padrão (conforme `BeansConfiguration`), a aplicação inicia com um `PedidoRepositoryInMemory`. Para usar JPA, é necessário trocar o bean ou criar uma configuração que exponha `PedidoRepositoryImpl` com um `PedidoJPARepository` real.
+- `PedidoRepositoryInMemory` gera ids sequenciais e está ativo para os profiles `inmemory` e `default`.
+- `PedidoRepositoryImpl` implementa a persistência via JPA (Postgres) e tenta resolver clientes existentes por email para evitar duplicidade. Flyway é usado para as migrações quando o profile `db` está ativo.
 
 Executando o projeto
 
 Modo rápido (sem banco)
 
-1) Build e run com Maven (usa repositório em memória configurado nos beans):
+1) Build e run com Maven (usa repositório em memória):
 
 ```bash
 ./mvnw clean package -DskipTests
@@ -136,9 +163,22 @@ cd docker-local
 docker compose up -d
 ```
 
-2) Ajuste `src/main/resources/application.yml` ou exporte variáveis de ambiente para apontar `spring.datasource.write` e `spring.datasource.read` para os containers Postgres (ex.: `jdbc:postgresql://localhost:5432/order_db`).
+2) Ajuste as variáveis de ambiente (exemplo usado nos meus testes):
 
-3) Habilite Flyway no `application.yml` (set `spring.flyway.enabled: true`) se quiser aplicar migrações automaticamente.
+```bash
+export SPRING_DATASOURCE_WRITE_URL="jdbc:postgresql://localhost:5432/order_db"
+export SPRING_DATASOURCE_READ_URL="$SPRING_DATASOURCE_WRITE_URL"
+export SPRING_DATASOURCE_WRITE_USERNAME="user"
+export SPRING_DATASOURCE_READ_USERNAME="user"
+export SPRING_DATASOURCE_WRITE_PASSWORD="password"
+export SPRING_DATASOURCE_READ_PASSWORD="password"
+export SPRING_PROFILES_ACTIVE=db
+# desabilitar restart automático do devtools para execuções locais:
+export SPRING_DEVTOOLS_RESTART_ENABLED=false
+./mvnw spring-boot:run
+```
+
+3) Flyway: as migrações serão aplicadas automaticamente quando o `profile=db` estiver ativo (ver logs do Flyway). Se preferir, altere `spring.flyway.enabled` no `application-db.yml`.
 
 Docker / Imagem
 
@@ -159,13 +199,15 @@ Manifestos estão na pasta `k8s/` (deployment, service, namespace). O `Makefile`
 Observabilidade
 
 - Spring Actuator expõe endpoints: /actuator/health, /actuator/info, /actuator/metrics e /actuator/prometheus conforme `application.yml`.
-- Micrometer + Prometheus: há dependência de `micrometer-registry-prometheus` e o `docker-local/docker-compose.yml` inclui um container Prometheus; as métricas do app são expostas em `/actuator/prometheus`.
+- Micrometer + Prometheus: dependência `micrometer-registry-prometheus` já está presente e as métricas estão expostas em `/actuator/prometheus`.
 - OpenTelemetry: `otel.exporter.otlp.endpoint` aponta para `http://localhost:4317` (Tempo/OTLP) e sampling está 100% por padrão (via `tracing.sampling.probability: 1.0`).
-- OpenAPI / Swagger
-  - A documentação OpenAPI é gerada automaticamente pelo `springdoc` e ficará disponível quando a aplicação estiver rodando em:
-    - Swagger UI: `/swagger-ui.html` ou `/swagger-ui/index.html`
-    - Spec JSON: `/v3/api-docs`
-  - Esses endpoints usam as classes, controladores e DTOs para montar a especificação automaticamente.
+
+OpenAPI / Swagger
+
+- A documentação OpenAPI é gerada automaticamente pelo `springdoc` e ficará disponível quando a aplicação estiver rodando em:
+  - Swagger UI: `/swagger-ui/index.html`
+  - Spec JSON: `/v3/api-docs`
+- Observação: removemos exemplos problemáticos que causavam `$requestExample` no Swagger UI; a spec agora usa schemas e descrições e exemplos compactos.
 
 Métricas personalizadas
 
@@ -182,17 +224,10 @@ Testes
 
 Notas, suposições e próximos passos
 
-- Suponho que a intenção é permitir alternância entre o `PedidoRepositoryInMemory` e uma implementação JPA (há infraestrutura pronta para ambos). O bean default atual expõe `PedidoRepositoryInMemory` no `BeansConfiguration`.
-- Se for rodar em produção com Postgres, ative Flyway e a configuração de datasources adequadas e remova/ajuste o bean in-memory.
-- Melhorias possíveis: validação de payload (Bean Validation), DTOs mais ricos com IDs gerados, paginação/listagem de pedidos, testes de integração, autenticação/autorização, contrato OpenAPI/Swagger.
+- Suponho que a intenção é permitir alternância entre o `PedidoRepositoryInMemory` e uma implementação JPA (há infraestrutura pronta para ambos). O repositório in-memory é o comportamento default; para usar JPA ative o profile `db`.
+- Recomendo adicionar mensagens de validação (i18n) se quiser mensagens de erro mais amigáveis/acentuadas em PT-BR.
+- Melhorias possíveis: paginação/listagem de pedidos, testes de integração, autenticação/autorização, contrato OpenAPI/Swagger gerado a partir de `api.yaml` (se você preferir manter a spec separada).
 
-Contato / Como contribuir
+Commit
 
-- Abra issues/PRs no repositório com descrições claras. Para alterações comportamentais (por exemplo, ativar JPA por padrão), inclua testes.
-
-Licença
-
-- Não definida no projeto (arquivo de licença não presente). Adicione um `LICENSE` se desejar explicitar a licença.
-
-
----
+Este README foi atualizado para refletir as últimas alterações de código (validação, ControllerAdvice, 201 Created, dessativação temporária de DevTools restart em execuções de teste).
