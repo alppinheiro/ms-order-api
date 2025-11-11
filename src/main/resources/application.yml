@@ -2,33 +2,6 @@ spring:
   application:
     name: ms-order-api
 
-  datasource:
-    read:
-      url: jdbc:postgresql://localhost:5433/order_db
-      username: user
-      password: password
-      driver-class-name: org.postgresql.Driver
-      hikari:
-        connection-test-query: SELECT 1
-    write:
-      url: jdbc:postgresql://localhost:5432/order_db
-      username: user
-      password: password
-      driver-class-name: org.postgresql.Driver
-      hikari:
-        connection-test-query: SELECT 1
-
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: true
-
-  flyway:
-    enabled: false
-    locations: classpath:db/migration
-    baseline-on-migrate: true
-    validate-on-migrate: true
-
 management:
   endpoints:
     web:
@@ -50,4 +23,15 @@ tracing:
 otel:
   exporter:
     otlp:
-      endpoint: http://localhost:4317  # OpenTelemetry Collector, Jaeger, Tempo...
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4317}  # OpenTelemetry Collector endpoint
+
+# Profile-specific configuration lives in separate files:
+# - application-inmemory.yml (perfil `inmemory`): usa H2 em memória, jpa ddl-auto=create-drop, flyway disabled
+# - application-db.yml (perfil `db`): usa Postgres para read/write e Flyway habilitado
+#
+# Ative um profile com:
+#   -Dspring.profiles.active=inmemory  (ou db)
+# ou via variável de ambiente: SPRING_PROFILES_ACTIVE=inmemory
+
+# Nota: não configuramos datasources e credenciais sensíveis diretamente aqui;
+# use variáveis de ambiente ou profiles específicos para isso.

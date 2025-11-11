@@ -1,12 +1,21 @@
 spring:
-  profiles: db
+  config:
+    activate:
+      on-profile: db
 
   datasource:
-    # exemplo de configuração única (pode ser adaptada para reader/writer se necessário)
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/order_db}
-    username: ${SPRING_DATASOURCE_USERNAME:order_user}
-    password: ${SPRING_DATASOURCE_PASSWORD:change_me}
-    driver-class-name: org.postgresql.Driver
+    # se você quiser usar apenas um datasource, mantenha SPRING_DATASOURCE_URL/USERNAME/PASSWORD
+    # para separar read/write use as propriedades abaixo (fallbacks para a mesma instância)
+    write:
+      url: ${SPRING_DATASOURCE_WRITE_URL:${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/order_db}}
+      username: ${SPRING_DATASOURCE_WRITE_USERNAME:${SPRING_DATASOURCE_USERNAME:user}}
+      password: ${SPRING_DATASOURCE_WRITE_PASSWORD:${SPRING_DATASOURCE_PASSWORD:password}}
+      driver-class-name: org.postgresql.Driver
+    read:
+      url: ${SPRING_DATASOURCE_READ_URL:${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/order_db}}
+      username: ${SPRING_DATASOURCE_READ_USERNAME:${SPRING_DATASOURCE_USERNAME:user}}
+      password: ${SPRING_DATASOURCE_READ_PASSWORD:${SPRING_DATASOURCE_PASSWORD:password}}
+      driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
 
@@ -19,10 +28,6 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
-# Se desejar separar read/write datasources, você pode definir:
-# spring:
-#   datasource:
-#     write.url: ...
-#     read.url: ...
-# e configurar um DataSource routing bean no código (DataSourceRouting/AbstractRoutingDataSource)
-
+# Se desejar separar read/write datasources, você pode usar as propriedades acima e o DataSource routing
+# que está implementado em 'DataSourceRoutingConfiguration'. Se não quiser separar, mantenha as variáveis
+# SPRING_DATASOURCE_URL/USERNAME/PASSWORD e o routing ainda terá fallback para o mesmo DB.

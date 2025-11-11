@@ -10,12 +10,12 @@ import jakarta.persistence.Table
 @Table(name = "enderecos")
 data class EnderecoEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
-    val rua: String,
-    val numero: String,
-    val complemento: String?,
-    val bairro: String,
-    val cidade: String,
-    val estado: String,
-    val cep: String
+    var id: Long? = null,
+    var rua: String = "",
+    var numero: String = "",
+    var complemento: String? = null,
+    var bairro: String = "",
+    var cidade: String = "",
+    var estado: String = "",
+    var cep: String = ""
 )

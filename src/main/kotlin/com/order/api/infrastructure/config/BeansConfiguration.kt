@@ -1,6 +1,5 @@
 package com.order.api.infrastructure.config
 
-import com.order.api.infrastructure.adapter.output.repository.PedidoRepositoryInMemory
 import com.order.api.application.usecase.ConsultarPedidoUseCase
 import com.order.api.application.usecase.CriarPedidoUseCase
 import com.order.api.domain.port.output.PedidoRepository
@@ -12,8 +11,9 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class BeansConfiguration {
-    @Bean
-    fun pedidoRepository(): PedidoRepository = PedidoRepositoryInMemory()
+    // A criação do PedidoRepository era feita manualmente aqui retornando a implementação em memória.
+    // Para delegar para profiles, removemos esse factory. As implementações estão anotadas com
+    // @Repository e @Profile("inmemory") ou @Profile("db") e serão registradas automaticamente.
 
     @Bean
     fun criarPedidoUseCase(pedidoRepository: PedidoRepository, metricsRecorder: MetricsRecorder): CriarPedidoUseCase =

@@ -1,13 +1,28 @@
 spring:
-  profiles: inmemory
+  config:
+    activate:
+      on-profile: inmemory
 
   datasource:
+    # configurações base (fallback)
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:order_db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
     username: sa
     password:
     hikari:
       connection-test-query: SELECT 1
+
+  # Especificamente apontar tanto write quanto read para a mesma instância H2 em memória
+    write:
+      url: jdbc:h2:mem:order_db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+      username: sa
+      password:
+      driver-class-name: org.h2.Driver
+    read:
+      url: jdbc:h2:mem:order_db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+      username: sa
+      password:
+      driver-class-name: org.h2.Driver
 
   jpa:
     hibernate:
@@ -20,4 +35,3 @@ spring:
 # Ajustes adicionais para H2 console (opcional)
 # spring.h2.console.enabled=true
 # spring.h2.console.path=/h2-console
-

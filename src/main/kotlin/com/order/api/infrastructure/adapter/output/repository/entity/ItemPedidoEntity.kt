@@ -12,15 +12,15 @@ import jakarta.persistence.Table
 import java.math.BigDecimal
 
 @Entity
-@Table(name = "itens_pedido")
-data class ItemPedidoEntity(
+@Table(name = "itens_pedidos")
+class ItemPedidoEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
-    val produto: String,
-    val quantidade: Int,
+    var id: Long? = null,
+    var produto: String = "",
+    var quantidade: Int = 0,
     @Column(name = "preco_unitario")
-    val precoUnitario: BigDecimal,
+    var precoUnitario: BigDecimal = java.math.BigDecimal.ZERO,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pedido_id")
-    val pedido: PedidoEntity
+    var pedido: PedidoEntity? = null
 )

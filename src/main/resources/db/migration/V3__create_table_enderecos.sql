@@ -1,7 +1,5 @@
-
-
 CREATE TABLE enderecos (
-  id SERIAL PRIMARY KEY,
+  id BIGSERIAL PRIMARY KEY,
   rua TEXT NOT NULL,
   numero TEXT NOT NULL,
   complemento TEXT,

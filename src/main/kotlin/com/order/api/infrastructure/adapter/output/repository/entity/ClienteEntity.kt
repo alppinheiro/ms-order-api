@@ -8,10 +8,10 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "clientes")
-data class ClienteEntity(
+class ClienteEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
-    val nome: String,
-    val email: String,
-    val cpf: String
+    var id: Long? = null,
+    var nome: String = "",
+    var email: String = "",
+    var cpf: String = ""
 )

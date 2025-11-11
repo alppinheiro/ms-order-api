@@ -1,18 +1,17 @@
 package com.order.api.infrastructure.adapter.output.mapper
 
 import com.order.api.domain.model.ItemPedido
-import com.order.api.domain.model.Pedido
 import com.order.api.infrastructure.adapter.output.repository.entity.ItemPedidoEntity
+import com.order.api.infrastructure.adapter.output.repository.entity.PedidoEntity
 
-class ItemPedidoEntityMapper(
-    private val pedidoEntityMapper: PedidoEntityMapper
-) {
-    fun toEntity(model: ItemPedido, pedido: Pedido) = ItemPedidoEntity(
-        id = 0,
+@org.springframework.stereotype.Component
+class ItemPedidoEntityMapper {
+    fun toEntity(model: ItemPedido, pedido: PedidoEntity) = ItemPedidoEntity(
+        id = null,
         produto = model.produto,
         quantidade = model.quantidade,
         precoUnitario = model.precoUnitario,
-        pedido = pedidoEntityMapper.toEntity(pedido)
+        pedido = pedido
     )
 
     fun toModel(entity: ItemPedidoEntity) = ItemPedido(

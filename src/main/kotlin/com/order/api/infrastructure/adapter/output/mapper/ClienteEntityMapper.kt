@@ -3,9 +3,11 @@ package com.order.api.infrastructure.adapter.output.mapper
 import com.order.api.domain.model.Cliente
 import com.order.api.infrastructure.adapter.output.repository.entity.ClienteEntity
 
+@org.springframework.stereotype.Component
 class ClienteEntityMapper {
     fun toEntity(model: Cliente) = ClienteEntity(
-        id = 0,
+        // new entities should have null id so JPA treats them as transient
+        id = null,
         nome = model.nome,
         email = model.email,
         cpf = model.cpf

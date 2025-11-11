@@ -18,27 +18,27 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "pedidos")
-data class PedidoEntity(
+class PedidoEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    var id: Long? = null,
 
     @Column(name = "data_criacao")
-    val dataCriacao: LocalDateTime = LocalDateTime.now(),
+    var dataCriacao: LocalDateTime = LocalDateTime.now(),
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
     @JoinColumn(name = "cliente_id")
-    val cliente: ClienteEntity,
+    var cliente: ClienteEntity = ClienteEntity(),
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
     @JoinColumn(name = "endereco_entrega_id")
-    val enderecoEntrega: EnderecoEntity,
+    var enderecoEntrega: EnderecoEntity = EnderecoEntity(),
 
     @OneToMany(mappedBy = "pedido", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val itens: List<ItemPedidoEntity> = listOf(),
+    var itens: MutableList<ItemPedidoEntity> = mutableListOf(),
 
     @Column(name = "valor_total")
-    val valorTotal: BigDecimal,
+    var valorTotal: BigDecimal = java.math.BigDecimal.ZERO,
 
     @Enumerated(EnumType.STRING)
-    val status: StatusPedidoEntity = StatusPedidoEntity.CRIADO
+    var status: StatusPedidoEntity = StatusPedidoEntity.CRIADO
 )

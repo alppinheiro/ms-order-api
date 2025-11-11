@@ -5,13 +5,16 @@ import com.order.api.application.usecase.CriarPedidoUseCase
 import com.order.api.domain.port.output.PedidoRepository
 import com.order.api.infrastructure.adapter.output.metric.MetricsRecorder
 import mu.KotlinLogging
+import org.springframework.transaction.annotation.Transactional
 
-class CriarPedidoService(
+open class CriarPedidoService(
     private val pedidoRepository: PedidoRepository,
     private val metrics: MetricsRecorder
 ) : CriarPedidoUseCase {
 
     private val logger = KotlinLogging.logger {}
+
+    @Transactional
     override fun criar(pedido: Pedido): Pedido {
         logger.info { "Camada service: CriarPedidoUseCase" }
         return pedidoRepository.salvar(pedido).also {

@@ -3,9 +3,10 @@ package com.order.api.infrastructure.adapter.output.mapper
 import com.order.api.domain.model.Endereco
 import com.order.api.infrastructure.adapter.output.repository.entity.EnderecoEntity
 
+@org.springframework.stereotype.Component
 class EnderecoEntityMapper {
     fun toEntity(model: Endereco) = EnderecoEntity(
-        id = 0,
+        id = null,
         rua = model.rua,
         numero = model.numero,
         complemento = model.complemento,
