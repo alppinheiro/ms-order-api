@@ -2,7 +2,6 @@ package com.order.api.domain.model
 
 import java.math.BigDecimal
 import java.time.LocalDateTime
-import java.util.*
 
 data class Pedido(
     val id: Long = 0L,

@@ -1,33 +1,6 @@
 package com.order.api.infrastructure.config
 
-import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.oas.models.info.Contact
-import io.swagger.v3.oas.models.info.Info
-import io.swagger.v3.oas.models.info.License
-import io.swagger.v3.oas.models.servers.Server
-import io.swagger.v3.oas.models.tags.Tag
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-
-@Configuration
-class OpenApiConfig {
-
-    @Bean
-    fun customOpenAPI(): OpenAPI {
-        val info = Info()
-            .title("ms-order-api")
-            .version("0.0.1")
-            .description("API de gerenciamento de pedidos (Pedidos) - microserviço exemplo com Kotlin + Spring Boot")
-            .contact(Contact().name("Equipe de Desenvolvimento").email("dev@example.com"))
-            .license(License().name("MIT").url("https://opensource.org/licenses/MIT"))
-
-        val serverLocal = Server().url("http://localhost:8080").description("Servidor local")
-
-        val tagOrders = Tag().name("Pedidos").description("Operações relacionadas a pedidos (criar/consultar)")
-
-        return OpenAPI()
-            .info(info)
-            .addServersItem(serverLocal)
-            .addTagsItem(tagOrders)
-    }
-}
+// This file was intentionally removed from the project.
+// OpenAPI / Swagger configuration was deleted as part of the cleanup.
+// If you want to re-enable runtime OpenAPI generation, re-add a configuration
+// class under com.order.api.infrastructure.config and the `springdoc` dependency in pom.xml.

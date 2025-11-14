@@ -204,10 +204,12 @@ Observabilidade
 
 OpenAPI / Swagger
 
-- A documentação OpenAPI é gerada automaticamente pelo `springdoc` e ficará disponível quando a aplicação estiver rodando em:
-  - Swagger UI: `/swagger-ui/index.html`
-  - Spec JSON: `/v3/api-docs`
-- Observação: removemos exemplos problemáticos que causavam `$requestExample` no Swagger UI; a spec agora usa schemas e descrições e exemplos compactos.
+Nota: a geração automática de documentação via `springdoc` foi removida deste projeto. Se você precisa de documentação OpenAPI, recomendamos uma das opções:
+
+- Manter uma especificação OpenAPI separada (`openapi.yaml`) no repositório e servir/validar a partir daí;
+- Readicionar `springdoc` (dependência e configuração) quando quiser que a spec seja gerada automaticamente em runtime.
+
+Atualmente não há endpoints `/v3/api-docs` ou `/swagger-ui` embutidos.
 
 Métricas personalizadas
 
