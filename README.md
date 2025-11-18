@@ -202,14 +202,9 @@ Observabilidade
 - Micrometer + Prometheus: dependência `micrometer-registry-prometheus` já está presente e as métricas estão expostas em `/actuator/prometheus`.
 - OpenTelemetry: `otel.exporter.otlp.endpoint` aponta para `http://localhost:4317` (Tempo/OTLP) e sampling está 100% por padrão (via `tracing.sampling.probability: 1.0`).
 
-OpenAPI / Swagger
+Documentação Swagger
 
-Nota: a geração automática de documentação via `springdoc` foi removida deste projeto. Se você precisa de documentação OpenAPI, recomendamos uma das opções:
-
-- Manter uma especificação OpenAPI separada (`openapi.yaml`) no repositório e servir/validar a partir daí;
-- Readicionar `springdoc` (dependência e configuração) quando quiser que a spec seja gerada automaticamente em runtime.
-
-Atualmente não há endpoints `/v3/api-docs` ou `/swagger-ui` embutidos.
+Atualmente não há integração com Swagger/OpenAPI neste projeto. A documentação de endpoints deve ser consultada diretamente no código ou em outras fontes que você mantenha manualmente.
 
 Métricas personalizadas
 

@@ -1,5 +1,6 @@
 package com.order.api.infrastructure.adapter.input.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.order.api.infrastructure.adapter.input.controller.mapper.PedidoRequestMapper
 import com.order.api.infrastructure.adapter.input.controller.mapper.PedidoResponseMapper
 import com.order.api.infrastructure.adapter.input.controller.request.PedidoRequest
@@ -21,15 +22,16 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/orders")
 class PedidoController(
     private val criarPedidoUseCase: CriarPedidoUseCase,
-    private val consultarPedidoUseCase: ConsultarPedidoUseCase
+    private val consultarPedidoUseCase: ConsultarPedidoUseCase,
+    private val objectMapper: ObjectMapper
 ) {
     private val logger = KotlinLogging.logger {}
 
     @Counted(value = "api.pedido.controller.count", description = "Contador de chamadas ao endpoint criar")
     @Timed(value = "api.pedido.controller.timer", description = "Tempo de resposta do endpoint criar")
     @PostMapping
-    fun criar(
-        @RequestBody @jakarta.validation.Valid request: PedidoRequest
+    fun criarPedido(
+        @RequestBody request: PedidoRequest
     ): ResponseEntity<PedidoResponse> {
         logger.info { "Chamando endpoint /criar" }
         val pedidoCriado = criarPedidoUseCase.criar(PedidoRequestMapper.toDomain(request))
@@ -42,9 +44,7 @@ class PedidoController(
     @Counted(value = "api.pedido.controller.count", description = "Contador de chamadas ao endpoint consultar")
     @Timed(value = "api.pedido.controller.timer", description = "Tempo de resposta do endpoint consultar")
     @GetMapping("/{id}")
-    fun consultar(
-        @PathVariable id: Long
-    ): ResponseEntity<PedidoResponse> {
+    fun consultarPedido(@PathVariable id: Long): ResponseEntity<PedidoResponse> {
         logger.info { "Chamando endpoint /consultar/${id}" }
         val pedido = consultarPedidoUseCase.consultar(id)
         return pedido?.let {
